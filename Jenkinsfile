@@ -8,6 +8,7 @@ pipeline {
         ENDEVOR_CONNECTION="--port 6002 --protocol http --reject-unauthorized false"
         ENDEVOR_LOCATION="--instance ENDEVOR --env DEV --sys MARBLES --sub MARBLES --ccid JENK05 --comment JENK05"
         ENDEVOR="$ENDEVOR_CONNECTION $ENDEVOR_LOCATION"
+        ZOWE_OPT_HOST=credentials('eosHost')
     }
     stages {
         stage('local setup') {
