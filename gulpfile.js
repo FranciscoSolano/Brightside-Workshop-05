@@ -92,7 +92,7 @@ gulp.task('copy-load', 'copy load lnk element', function (callback) {
 });
 gulp.task('copy-dbrm', 'copy dbrm element', function (callback) {
   var FMP = (typeof process.env.FMP === "undefined") ? "" : process.env.FMP,
-      command = 'bright file-master-plus copy data-set "PRODUCT.NDVR.MARBLES.MARBLES.D1.DBRM" "BRIGHT.MARBLES.DBRMLIB" -m MARBLE05 ' + FMP;
+      command = 'bright file-master-plus copy data-set "PRODUCT.NDVR.MARBLES.MARBLES.D1.DBRMLIB" "BRIGHT.MARBLES.DBRMLIB" -m MARBLE05 ' + FMP;
   cmd.get(command, function (err, data, stderr) {
     if(err){
       callback(err);
