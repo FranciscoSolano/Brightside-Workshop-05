@@ -61,3 +61,20 @@ gulp.task('build-cobol', 'Build COBOL element', function (callback) {
     }
   });
 });
+
+gulp.task('build-lnk', 'Build lnk element', function (callback) {
+  var endevor = (typeof process.env.ENDEVOR === "undefined") ? "" : process.env.ENDEVOR,
+      command = "bright endevor generate element MARBLE05 --type LNK --override-signout --maxrc 0 " + endevor;
+
+  cmd.get(command, function (err, data, stderr) {
+    if(err){
+      callback(err);
+    } else if (stderr){
+      callback(new Error("\nCommand:\n" + command + "\n" + stderr + "Stack Trace:"));
+    } else {
+      callback();
+    }
+  });
+});
+
+gulp.task('build', 'bulid program', gulpSequence('build-cobol','build-lnk'));
