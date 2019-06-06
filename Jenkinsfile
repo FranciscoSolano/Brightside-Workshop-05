@@ -6,7 +6,7 @@ pipeline {
         DEPLOY = "./jenkins/deploy.sh"
         TEST = "./jenkins/test.sh"
         ENDEVOR_CONNECTION="--port 6002 --protocol http --reject-unauthorized false"
-        ENDEVOR_LOCATION="--instance ENDEVOR --env DEV --sys MARBLES --sub MARBLES --ccid JENK05 --comment JENK05"
+        ENDEVOR_LOCATION="--instance ENDEVOR --env DEV --sys MARBLES --sub MARBLES --stage-number 1 --ccid JENK05 --comment JENK05"
         ENDEVOR="$ENDEVOR_CONNECTION $ENDEVOR_LOCATION"
         ZOWE_OPT_HOST=credentials('eosHost')
     }
