@@ -124,7 +124,7 @@ gulp.task('bind-n-grant', 'bind & grant', function (callback) {
 });
 gulp.task('cics-refresh', 'cics refresh element', function (callback) {
   var CICS = (typeof process.env.CICS === "undefined") ? "" : process.env.CICS,
-      command = 'brigh cics refresh program MARBLE05' + CICS;
+      command = 'bright cics refresh program MARBLE05' + CICS;
   cmd.get(command, function (err, data, stderr) {
     if(err){
       callback(err);
