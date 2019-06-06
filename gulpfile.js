@@ -136,4 +136,4 @@ gulp.task('cics-refresh', 'cics refresh element', function (callback) {
   });
 });
 gulp.task('build', 'bulid program', gulpSequence('build-cobol','build-lnk'));
-gulp.task('deploy', 'deploy program', gulpSequence('copy-loaf','copy-dbrm','bind-n-grant','cics-refresh'));
+gulp.task('deploy', 'deploy program', gulpSequence('copy-load','copy-dbrm','bind-n-grant','cics-refresh'));
