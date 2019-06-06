@@ -76,5 +76,64 @@ gulp.task('build-lnk', 'Build lnk element', function (callback) {
     }
   });
 });
+gulp.task('copy-load', 'copy load lnk element', function (callback) {
+  var FMP = (typeof process.env.FMP === "undefined") ? "" : process.env.FMP,
+      command = 'bright file-master-plus copy data-set "PRODUCT.NDVR.MARBLES.MARBLES.D1.LOADLIB" "CICS.TRAIN.MARBLES.LOADLIB" -m MARBLE05 ' + FMP;
 
+  cmd.get(command, function (err, data, stderr) {
+    if(err){
+      callback(err);
+    } else if (stderr){
+      callback(new Error("\nCommand:\n" + command + "\n" + stderr + "Stack Trace:"));
+    } else {
+      callback();
+    }
+  });
+});
+gulp.task('copy-dbrm', 'copy dbrm element', function (callback) {
+  var FMP = (typeof process.env.FMP === "undefined") ? "" : process.env.FMP,
+      command = 'bright file-master-plus copy data-set "PRODUCT.NDVR.MARBLES.MARBLES.D1.DBRM" "BRIGHT.MARBLES.DBRMLIB" -m MARBLE05 ' + FMP;
+  cmd.get(command, function (err, data, stderr) {
+    if(err){
+      callback(err);
+    } else if (stderr){
+      callback(new Error("\nCommand:\n" + command + "\n" + stderr + "Stack Trace:"));
+    } else {
+      callback();
+    }
+  });
+});
+gulp.task('bind-n-grant', 'bind & grant', function (callback) {
+  var command = 'bright jobs submit data-set "CUST005.MARBLES.JCL(MARBIND)" --rff jobid --rft string';
+  cmd.get(command, function (err, data, stderr) {
+    if(err){
+      callback(err);
+    } else if (stderr){
+      callback(new Error("\nCommand:\n" + command + "\n" + stderr + "Stack Trace:"));
+    } else {
+      var jobid = data.trim();
+      awaitJobCompletion(jobid, 4, function(err){
+        if(err){
+          callback(err);
+        }else {
+          callback();
+        }
+      });
+    }
+  });
+});
+gulp.task('cics-refresh', 'cics refresh element', function (callback) {
+  var CICS = (typeof process.env.CICS === "undefined") ? "" : process.env.CICS,
+      command = 'brigh cics refresh program MARBLE05' + CICS;
+  cmd.get(command, function (err, data, stderr) {
+    if(err){
+      callback(err);
+    } else if (stderr){
+      callback(new Error("\nCommand:\n" + command + "\n" + stderr + "Stack Trace:"));
+    } else {
+      callback();
+    }
+  });
+});
 gulp.task('build', 'bulid program', gulpSequence('build-cobol','build-lnk'));
+gulp.task('deploy', 'deploy program', gulpSequence('copy-loaf','copy-dbrm','bind-n-grant','cics-refresh'));

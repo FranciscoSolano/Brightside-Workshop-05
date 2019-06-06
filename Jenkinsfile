@@ -3,12 +3,16 @@ pipeline {
     environment {
         // Scripts
         // BUILD = "./jenkins/build.sh"
-        DEPLOY = "./jenkins/deploy.sh"
+        // DEPLOY = "./jenkins/deploy.sh"
         TEST = "./jenkins/test.sh"
         ENDEVOR_CONNECTION="--port 6002 --protocol http --reject-unauthorized false"
         ENDEVOR_LOCATION="--instance ENDEVOR --env DEV --sys MARBLES --sub MARBLES --stage-number 1 --ccid JENK05 --comment JENK05"
         ENDEVOR="$ENDEVOR_CONNECTION $ENDEVOR_LOCATION"
         ZOWE_OPT_HOST=credentials('eosHost')
+        ZOWE_OPT_PORT="443"
+        ZOWE_OPT_REJECT_UNAUTHORIZED=false
+        FMP=" --port 6001 --protocol http --reject-unauthorized false"
+        CICS=" --port 6000 --region-name CICSTRN1"
     }
     stages {
         stage('local setup') {
@@ -30,14 +34,14 @@ pipeline {
         }
         stage('deploy') {
             steps {
-                sh "chmod +x $DEPLOY && $DEPLOY"
+               
                 //ZOWE_OPT_USER & ZOWE_OPT_PASSWORD are used to interact with z/OSMF and CICS
-                // withCredentials([usernamePassword(credentialsId: 'eosCreds', usernameVariable: 'ZOWE_OPT_USER', passwordVariable: 'ZOWE_OPT_PASSWORD')]) {
-                //     //ZOWE_OPT_PASS is used by FMP plugin
-                //     withCredentials([usernamePassword(credentialsId: 'eosCreds', usernameVariable: 'ZOWE_OPT_USER', passwordVariable: 'ZOWE_OPT_PASS')]) {
-                //        
-                //     }
-                // }
+                withCredentials([usernamePassword(credentialsId: 'eosCreds', usernameVariable: 'ZOWE_OPT_USER', passwordVariable: 'ZOWE_OPT_PASSWORD')]) {
+               
+                     //ZOWE_OPT_PASS is used by FMP plugin
+                     withCredentials([usernamePassword(credentialsId: 'eosCreds', usernameVariable: 'ZOWE_OPT_USER', passwordVariable: 'ZOWE_OPT_PASS')]) {
+                sh 'gulp deploy'}       
+                    }
             }
         }
         stage('test') {
