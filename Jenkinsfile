@@ -49,7 +49,7 @@ pipeline {
                 
                 //ZOWE_OPT_USER & ZOWE_OPT_PASS are used to interact with z/OSMF
                 withCredentials([usernamePassword(credentialsId: 'eosCreds', usernameVariable: 'ZOWE_OPT_USER', passwordVariable: 'ZOWE_OPT_PASSWORD')]) {
-                npm test}
+                sh 'npm test'}
             }
         }
     }
