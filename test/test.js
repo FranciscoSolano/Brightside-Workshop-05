@@ -19,6 +19,8 @@ var cmd = require('node-cmd');
  * @callback awaitQuantityCallback
  * @param {Error}  err 
  * @param {number} quantity null if marble is not defined in inventory
+ * @param {number} cost null if marble is not defined in inventory
+ * 
  */
 
 /**
@@ -53,11 +55,12 @@ function awaitJobCompletion(jobId, callback, tries = 30, wait = 1000) {
 * Creates a Marble with an initial quantity
 * @param {string}           color        color of Marble to create
 * @param {number}           [quantity=1] quantity of Marbles to initially create
+* @param {number}           [cost=1] cost of Marbles to initially create
 * @param {nodeCmdCallback}  [callback]   function to call after completion, callback(err, data, stderr)
 */
-function createMarble(color, quantity=1, callback) {
+function createMarble(color, quantity=1, cost=1, callback) {
   cmd.get(
-    'bright console issue command "F CICSTRN1,MB05 CRE ' + color + " " + quantity + '" --cn CUST005',
+    'bright console issue command "F CICSTRN1,MB05 CRE ' + color + " " + quantity + " " + cost + '" --cn CUST005',
     function (err, data, stderr) {
       typeof callback === 'function' && callback(err, data, stderr);
     }
@@ -114,7 +117,8 @@ function getMarbleQuantity(color, callback) {
                     //found should look like nn_| COLOR       |       QUANTITY |        COST |
                     var row = found[0].split("|");
                     var quantity = Number(row[2]);
-                    callback(err, quantity);
+                    var cost = Number(row[3]);
+                    callback(err, quantity, cost);
                   }
                 }
               }
@@ -185,14 +189,14 @@ describe('Marbles', function () {
       })
     });
 
-    it('should create a single marble', function (done) {
+    it('should create a single marble with a cost of 1', function (done) {
       // Create marble
-      createMarble(COLOR, 1, function(err, data, stderr){
+      createMarble(COLOR, 1, 1, function(err, data, stderr){
         // Strip unwanted whitespace/newline
         data = data.trim();
         assert.equal(data, "+SUCCESS", "Unsuccessful marble creation");
 
-        getMarbleQuantity(COLOR, function(err, quantity){
+        getMarbleQuantity(COLOR, function(err, quantity, cost){
           if(err){
             throw err;
           }
@@ -204,13 +208,13 @@ describe('Marbles', function () {
 
     it('should not create a marble of a color that already exists', function (done) {
       // Create marble
-      createMarble(COLOR, 2, function(err, data, stderr){
+      createMarble(COLOR, 2,2, function(err, data, stderr){
         // Strip unwanted whitespace/newline
         data = data.trim();
         assert.equal(data, "+MARB002E Color (" + COLOR + ") already exists, UPDate or DELete it.", "Unexpected marble creation or incorrect error message");
 
         // Confirm quantity is unchanged
-        getMarbleQuantity(COLOR, function(err, quantity){
+        getMarbleQuantity(COLOR, function(err, quantity, cost){
           if(err){
             throw err;
           }
@@ -228,7 +232,7 @@ describe('Marbles', function () {
         assert.equal(data, "+SUCCESS", "Unsuccessful marble update");
 
         // Marble inventory should be updated
-        getMarbleQuantity(COLOR, function(err, quantity){
+        getMarbleQuantity(COLOR, function(err, quantity, cost){
           if(err){
             throw err;
           }
@@ -246,7 +250,7 @@ describe('Marbles', function () {
         assert.equal(data, "+SUCCESS", "Unsuccessful marble deletion");
 
         //Marble should be removed from inventory
-        getMarbleQuantity(COLOR, function(err, quantity){
+        getMarbleQuantity(COLOR, function(err, quantity, cost){
           if(err){
             throw err;
           }
@@ -264,7 +268,7 @@ describe('Marbles', function () {
         assert.equal(data, "+MARB001E Color (" + COLOR + ") not found in inventory, CREate it.", "Unexpected marble redeletion or incorrect error message");
 
         // Marble should still not be in inventory
-        getMarbleQuantity(COLOR, function(err, quantity){
+        getMarbleQuantity(COLOR, function(err, quantity, cost){
           if(err){
             throw err;
           }
